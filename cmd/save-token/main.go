@@ -54,6 +54,7 @@ func run(ctx context.Context, log *slog.Logger, opts Options) error {
 	return nil
 }
 
+// TODO: set up a http server so you dont have to copy the code out of the url..
 func getToken(ctx context.Context, config *oauth2.Config) (*oauth2.Token, error) {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("Go to the following link in your browser then type the "+

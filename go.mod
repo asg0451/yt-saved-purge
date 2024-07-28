@@ -3,6 +3,7 @@ module go.coldcutz.net/yt-saved-purge
 go 1.22.1
 
 require (
+	github.com/davecgh/go-spew v1.1.1
 	go.coldcutz.net/go-stuff v0.0.2
 	golang.org/x/oauth2 v0.14.0
 	google.golang.org/api v0.149.0
