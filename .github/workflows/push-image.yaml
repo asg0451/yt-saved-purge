@@ -1,0 +1,52 @@
+name: Push Image
+
+on: workflow_dispatch # manual
+env:
+  CARGO_TERM_COLOR: always
+
+permissions:
+  contents: write # for release
+
+jobs:
+  push-image:
+    runs-on: ubuntu-latest
+    # Permissions to use OIDC token authentication - depot
+    permissions:
+      contents: read
+      id-token: write
+      # Allows pushing to the GitHub Container Registry
+      packages: write
+
+    env:
+      IMAGE_NAME: ${{ github.repository }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Log in to the Github Packages Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+
+      - uses: depot/setup-action@v1
+      - uses: depot/build-push-action@v1
+        with:
+          context: .
+          tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/amd64,linux/arm64
+          push: true
